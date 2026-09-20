@@ -1,12 +1,67 @@
-import webview
+"""Start MOPA and store preferences outside the Git repository."""
+import os
+import sqlite3
+from pathlib import Path
+
+
+DEFAULTS = {"language": "en", "temperature": "fahrenheit", "theme": "dark"}
+CHOICES = {
+    "language": {"en", "zh-Hans", "zh-Hant", "ja", "ko", "es"},
+    "temperature": {"fahrenheit", "celsius"},
+    "theme": {"dark", "light"},
+}
+
+
+class SettingsAPI:
+    def __init__(self, database_path):
+        self._database = Path(database_path)
+
+    def _connect(self):
+        self._database.parent.mkdir(parents=True, exist_ok=True)
+        connection = sqlite3.connect(self._database)
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS settings (name TEXT PRIMARY KEY, value TEXT NOT NULL)"
+        )
+        return connection
+
+    def get_settings(self):
+        settings = DEFAULTS.copy()
+        connection = self._connect()
+        try:
+            for name, value in connection.execute("SELECT name, value FROM settings"):
+                if name in CHOICES and value in CHOICES[name]:
+                    settings[name] = value
+        finally:
+            connection.close()
+        return settings
+
+    def save_settings(self, settings):
+        if not isinstance(settings, dict) or set(settings) != set(DEFAULTS):
+            raise ValueError("Invalid preferences")
+        for name, value in settings.items():
+            if not isinstance(value, str) or value not in CHOICES[name]:
+                raise ValueError("Invalid preference value")
+        connection = self._connect()
+        try:
+            with connection:
+                connection.executemany(
+                    "INSERT INTO settings(name, value) VALUES (?, ?) "
+                    "ON CONFLICT(name) DO UPDATE SET value=excluded.value",
+                    settings.items(),
+                )
+        finally:
+            connection.close()
+        return settings
 
 
 if __name__ == "__main__":
-    webview.create_window(
-        title="MOPA",
-        url="ui/index.html",
-        width=1000,
-        height=700,
-    )
+    import webview
 
-    webview.start()
+    data_folder = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "MOPA"
+    api = SettingsAPI(data_folder / "settings.db")
+    page = Path(__file__).resolve().parent / "UI" / "index.html"
+    webview.create_window(
+        title="MOPA", url=str(page), js_api=api,
+        width=1000, height=700, min_size=(600, 450),
+    )
+    webview.start(http_server=True)

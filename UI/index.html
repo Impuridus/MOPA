@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOPA</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="translations.js" defer></script>
     <script src="app.js" defer></script>
 </head>
 <body>
@@ -16,65 +17,104 @@
 
         <p class="sidebar-label">MOPA</p>
 
-        <nav aria-label="Features">
+        <nav aria-label="Features" id="feature-nav">
     <section class="nav-section">
-        <h2 class="sidebar-label">Work</h2>
-        <button type="button" disabled>Coming soon</button>
+        <h2 class="sidebar-label" data-i18n="work">Work</h2>
+        <button type="button" disabled data-i18n="soon">Coming soon</button>
     </section>
 
     <section class="nav-section">
-        <h2 class="sidebar-label">Life</h2>
-        <button type="button" disabled>Coming soon</button>
+        <h2 class="sidebar-label" data-i18n="life">Life</h2>
+        <button type="button" disabled data-i18n="soon">Coming soon</button>
     </section>
 
     <section class="nav-section">
-        <h2 class="sidebar-label">Daily</h2>
+        <h2 class="sidebar-label" data-i18n="daily">Daily</h2>
         <button type="button" id="weather-button"
                 aria-controls="weather-panel">
-            ☀ Weather
+            ☀ <span data-i18n="weather">Weather</span>
         </button>
     </section>
 </nav>
+<div class="sidebar-footer">
+    <button type="button" id="settings-button" aria-controls="settings-panel">
+        <span aria-hidden="true">⚙</span>
+        <span data-i18n="settings">Settings</span>
+    </button>
+</div>
     </aside>
 
     <main>
         <section id="welcome-panel" class="welcome">
-            <h1>Your space, your day.</h1>
-            <p>Select Weather to get started.</p>
+            <h1 data-i18n="welcome">Your space, your day.</h1>
+            <p data-i18n="start">Select Weather to get started.</p>
         </section>
 
         <section id="weather-panel" hidden>
             <header class="panel-header">
-                <h1>Weather</h1>
-                <span class="sample-label">Design preview · Sample data</span>
+                <h1 tabindex="-1" data-i18n="weather">Weather</h1>
+                <span class="sample-label" data-i18n="sample">Design preview · Sample data</span>
             </header>
 
             <div class="weather-summary">
-                <h2>New York</h2>
-                <p class="temperature">72°<span>F</span></p>
-                <p class="condition">Mostly sunny</p>
-                <p>H: 76° · L: 63°</p>
+                <h2 data-i18n="city">New York</h2>
+                <p class="temperature" id="temperature"></p>
+                <p class="condition" data-i18n="sunny">Mostly sunny</p>
+                <p id="high-low"></p>
             </div>
 
             <div class="weather-details">
                 <article class="weather-card">
-                    <h3>Feels like</h3>
-                    <p class="card-value">74°F</p>
-                    <p>A little warmer in the sun.</p>
+                    <h3 data-i18n="feels">Feels like</h3>
+                    <p class="card-value" id="feels-temperature"></p>
+                    <p data-i18n="warmer">A little warmer in the sun.</p>
                 </article>
 
                 <article class="weather-card">
-                    <h3>Humidity</h3>
+                    <h3 data-i18n="humidity">Humidity</h3>
                     <p class="card-value">58%</p>
-                    <p>Sample humidity reading.</p>
+                    <p data-i18n="humidityNote">Sample humidity reading.</p>
                 </article>
 
                 <article class="weather-card">
-                    <h3>Wind</h3>
-                    <p class="card-value">8 mph</p>
-                    <p>From the southwest.</p>
+                    <h3 data-i18n="wind">Wind</h3>
+                    <p class="card-value" id="wind-value"></p>
+                    <p data-i18n="southwest">From the southwest.</p>
                 </article>
             </div>
+        </section>
+        <section id="settings-panel" hidden>
+            <header class="panel-header"><h1 tabindex="-1" data-i18n="settings">Settings</h1></header>
+            <p class="settings-intro" data-i18n="intro"></p>
+            <div class="settings-list">
+                <div class="setting-row">
+                    <div><label for="language-select" data-i18n="language"></label><p id="language-help" data-i18n="languageHelp"></p></div>
+                    <select id="language-select" aria-describedby="language-help" disabled>
+                        <option value="en" lang="en">English</option>
+                        <option value="zh-Hans" lang="zh-Hans">简体中文</option>
+                        <option value="zh-Hant" lang="zh-Hant">繁體中文</option>
+                        <option value="ja" lang="ja">日本語</option>
+                        <option value="ko" lang="ko">한국어</option>
+                        <option value="es" lang="es">Español</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <div><label for="temperature-select" data-i18n="units"></label><p id="units-help" data-i18n="unitsHelp"></p></div>
+                    <select id="temperature-select" aria-describedby="units-help" disabled>
+                        <option value="fahrenheit" data-i18n="fahrenheit"></option>
+                        <option value="celsius" data-i18n="celsius"></option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <div><label for="theme-select" data-i18n="appearance"></label><p id="theme-help" data-i18n="themeHelp"></p></div>
+                    <select id="theme-select" aria-describedby="theme-help" disabled>
+                        <option value="dark" data-i18n="dark"></option>
+                        <option value="light" data-i18n="light"></option>
+                    </select>
+                </div>
+            </div>
+            <p id="settings-status" role="status" aria-live="polite"></p>
+            <button type="button" id="retry-button" data-i18n="retry" hidden></button>
         </section>
     </main>
 </body>
