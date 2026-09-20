@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOPA</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <header class="clock">
+            <p id="current-time"></p>
+            <p id="current-date"></p>
+        </header>
+
+        <p class="sidebar-label">MOPA</p>
+
+        <nav aria-label="Features">
+    <section class="nav-section">
+        <h2 class="sidebar-label">Work</h2>
+        <button type="button" disabled>Coming soon</button>
+    </section>
+
+    <section class="nav-section">
+        <h2 class="sidebar-label">Life</h2>
+        <button type="button" disabled>Coming soon</button>
+    </section>
+
+    <section class="nav-section">
+        <h2 class="sidebar-label">Daily</h2>
+        <button type="button" id="weather-button"
+                aria-controls="weather-panel">
+            ☀ Weather
+        </button>
+    </section>
+</nav>
+    </aside>
+
+    <main>
+        <section id="welcome-panel" class="welcome">
+            <h1>Your space, your day.</h1>
+            <p>Select Weather to get started.</p>
+        </section>
+
+        <section id="weather-panel" hidden>
+            <header class="panel-header">
+                <h1>Weather</h1>
+                <span class="sample-label">Design preview · Sample data</span>
+            </header>
+
+            <div class="weather-summary">
+                <h2>New York</h2>
+                <p class="temperature">72°<span>F</span></p>
+                <p class="condition">Mostly sunny</p>
+                <p>H: 76° · L: 63°</p>
+            </div>
+
+            <div class="weather-details">
+                <article class="weather-card">
+                    <h3>Feels like</h3>
+                    <p class="card-value">74°F</p>
+                    <p>A little warmer in the sun.</p>
+                </article>
+
+                <article class="weather-card">
+                    <h3>Humidity</h3>
+                    <p class="card-value">58%</p>
+                    <p>Sample humidity reading.</p>
+                </article>
+
+                <article class="weather-card">
+                    <h3>Wind</h3>
+                    <p class="card-value">8 mph</p>
+                    <p>From the southwest.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Virtual environment
+MOPA/
+
+# Generated Python files
+__pycache__/
+*.pyc
+
+# Local secrets
+.env
+
+# Personal app databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
