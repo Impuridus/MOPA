@@ -355,3 +355,11 @@ select:disabled { opacity: .6; }
     .setting-row { align-items: stretch; flex-direction: column; gap: 12px; }
     .setting-row select { width: 100%; }
 }
+
+#refresh-weather { padding: 8px 14px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+#refresh-weather:disabled { opacity: .6; cursor: wait; }
+#refresh-weather:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+#weather-status { color: var(--muted); font-size: 13px; line-height: 1.6; }
+#weather-panel a { color: var(--text); }
+
+#weather-panel .weather-card .card-value { font-size: 26px; color: var(--text); margin: 14px 0 10px; }

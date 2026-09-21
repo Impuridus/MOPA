@@ -2,13 +2,15 @@
 import os
 import sqlite3
 from pathlib import Path
+from weather import get_weather
 
 
-DEFAULTS = {"language": "en", "temperature": "fahrenheit", "theme": "dark"}
+DEFAULTS = {"language": "en", "temperature": "fahrenheit", "theme": "dark", "calendar": "gregorian"}
 CHOICES = {
     "language": {"en", "zh-Hans", "zh-Hant", "ja", "ko", "es"},
     "temperature": {"fahrenheit", "celsius"},
     "theme": {"dark", "light"},
+    "calendar": {"gregorian", "chinese"},
 }
 
 
@@ -23,6 +25,26 @@ class SettingsAPI:
             "CREATE TABLE IF NOT EXISTS settings (name TEXT PRIMARY KEY, value TEXT NOT NULL)"
         )
         return connection
+
+    def get_calendar(self, mode, year=None, month=None, anchor=None):
+        from calendar_service import CalendarService
+        return CalendarService(self._database).month(mode, year, month, anchor)
+
+    def get_calendar_day(self, mode, day):
+        from calendar_service import CalendarService
+        return CalendarService(self._database).day(mode, day)
+
+    def save_calendar_event(self, day, title, notes='', event_id=None, starts_at=None, ends_at=None):
+        from calendar_service import CalendarService
+        return CalendarService(self._database).save_event(day, title, notes, event_id, starts_at, ends_at)
+
+    def delete_calendar_event(self, event_id):
+        from calendar_service import CalendarService
+        return CalendarService(self._database).delete_event(event_id)
+
+    def get_weather(self):
+        self._database.parent.mkdir(parents=True, exist_ok=True)
+        return get_weather(self._database)
 
     def get_settings(self):
         settings = DEFAULTS.copy()

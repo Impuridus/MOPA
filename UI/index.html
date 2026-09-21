@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOPA</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="calendar.css">
     <script src="translations.js" defer></script>
+    <script src="calendar.js" defer></script>
     <script src="app.js" defer></script>
 </head>
 <body>
@@ -15,8 +17,6 @@
             <p id="current-date"></p>
         </header>
 
-        <p class="sidebar-label">MOPA</p>
-
         <nav aria-label="Features" id="feature-nav">
     <section class="nav-section">
         <h2 class="sidebar-label" data-i18n="work">Work</h2>
@@ -25,14 +25,28 @@
 
     <section class="nav-section">
         <h2 class="sidebar-label" data-i18n="life">Life</h2>
-        <button type="button" disabled data-i18n="soon">Coming soon</button>
+        <button type="button" id="workout-button" 
+                aria-controls="workout-panel" lang="en">
+                <span aria-hidden="true">🔥</span> Workout
+        </button>
+        <button type="button" id="diet-button"
+                aria-controls="diet-panel" lang="en">
+                <span aria-hidden="true">🍖</span> Diet
+        </button>
     </section>
 
     <section class="nav-section">
         <h2 class="sidebar-label" data-i18n="daily">Daily</h2>
         <button type="button" id="weather-button"
                 aria-controls="weather-panel">
-            ☀ <span data-i18n="weather">Weather</span>
+            🌤️ <span data-i18n="weather">Weather</span>
+        </button>
+        <button type="button" id="calendar-button" aria-controls="calendar-panel" lang="en">
+            <span aria-hidden="true">📅</span> Calendar
+        </button>
+        <button type="button" id="music-button"
+                aria-controls="music-panel" lang="en">
+                <span aria-hidden="true">🎵</span> Music
         </button>
     </section>
 </nav>
@@ -53,13 +67,14 @@
         <section id="weather-panel" hidden>
             <header class="panel-header">
                 <h1 tabindex="-1" data-i18n="weather">Weather</h1>
-                <span class="sample-label" data-i18n="sample">Design preview · Sample data</span>
+                <button type="button" id="refresh-weather" lang="en">Refresh</button>
             </header>
 
             <div class="weather-summary">
-                <h2 data-i18n="city">New York</h2>
+                <h2 lang="en">Storrs Mansfield, CT</h2>
+                <p id="weather-status" role="status" lang="en">Open Weather to load current conditions.</p>
                 <p class="temperature" id="temperature"></p>
-                <p class="condition" data-i18n="sunny">Mostly sunny</p>
+                <p class="condition" id="weather-condition" lang="en">—</p>
                 <p id="high-low"></p>
             </div>
 
@@ -67,26 +82,34 @@
                 <article class="weather-card">
                     <h3 data-i18n="feels">Feels like</h3>
                     <p class="card-value" id="feels-temperature"></p>
-                    <p data-i18n="warmer">A little warmer in the sun.</p>
+                    
                 </article>
 
                 <article class="weather-card">
                     <h3 data-i18n="humidity">Humidity</h3>
-                    <p class="card-value">58%</p>
-                    <p data-i18n="humidityNote">Sample humidity reading.</p>
+                    <p class="card-value" id="humidity-value">—</p>
+                    
                 </article>
 
                 <article class="weather-card">
                     <h3 data-i18n="wind">Wind</h3>
                     <p class="card-value" id="wind-value"></p>
-                    <p data-i18n="southwest">From the southwest.</p>
+                    <p id="wind-direction" lang="en"></p>
                 </article>
             </div>
+            <p class="settings-intro" lang="en">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · Current conditions are model estimates. Times shown are local to Storrs.</p>
         </section>
         <section id="settings-panel" hidden>
             <header class="panel-header"><h1 tabindex="-1" data-i18n="settings">Settings</h1></header>
             <p class="settings-intro" data-i18n="intro"></p>
             <div class="settings-list">
+                <div class="setting-row" lang="en">
+                    <div><label for="calendar-select">Calendar</label><p id="calendar-help">Choose month layout and holidays. Your events stay on the same actual dates.</p></div>
+                    <select id="calendar-select" aria-describedby="calendar-help" disabled>
+                        <option value="gregorian">Gregorian · U.S. holidays</option>
+                        <option value="chinese">Chinese lunisolar · China holidays</option>
+                    </select>
+                </div>
                 <div class="setting-row">
                     <div><label for="language-select" data-i18n="language"></label><p id="language-help" data-i18n="languageHelp"></p></div>
                     <select id="language-select" aria-describedby="language-help" disabled>
@@ -116,6 +139,83 @@
             <p id="settings-status" role="status" aria-live="polite"></p>
             <button type="button" id="retry-button" data-i18n="retry" hidden></button>
         </section>
+        <section id="workout-panel" lang="en" hidden>
+            <header class="panel-header"><h1 tabindex="-1">Workout</h1></header>
+            <p class="settings-intro">Your workout space. Features coming soon.</p>
+        </section>
+        <section id="diet-panel" lang="en" hidden>
+            <header class="panel-header"><h1 tabindex="-1">Diet</h1></header>
+            <p class="settings-intro">Your diet space. Features coming soon.</p>
+        </section>
+        <section id="music-panel" lang="en" hidden>
+            <header class="panel-header">
+            <h1 tabindex="-1">Music</h1>
+            </header>
+            <p class="settings-intro">Your music space. Features coming soon.</p>
+        </section>
+        <section id="calendar-panel" lang="en" tabindex="-1" aria-label="Calendar" hidden>
+            <div id="calendar-error" class="calendar-error" role="alert" hidden>
+                <span id="calendar-status"></span>
+                <button id="calendar-retry" type="button">Retry</button>
+            </div>
+            <div id="calendar-content" hidden>
+                <div class="calendar-toolbar">
+                    <div class="calendar-navigation" aria-label="Calendar navigation">
+                        <button id="calendar-previous" type="button" aria-label="Previous month">‹</button>
+                        <select id="calendar-month" aria-label="Month"></select>
+                        <select id="calendar-year" aria-label="Year"></select>
+                        <button id="calendar-next" type="button" aria-label="Next month">›</button>
+                        <button id="calendar-today" type="button">Today</button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+                <div id="calendar-grid" class="calendar-grid" role="group" aria-label="Dates"></div>
+            </div>
+
+            <dialog id="calendar-day-dialog" class="calendar-dialog day-dialog" aria-labelledby="day-title">
+                <header class="calendar-dialog-header">
+                    <div><h2 id="day-title"></h2><p id="day-subtitle"></p></div>
+                    <div class="calendar-dialog-actions">
+                        <button id="day-add" type="button">Add event</button>
+                        <button id="day-close" type="button" aria-label="Close day schedule">✕</button>
+                    </div>
+                </header>
+                <div id="day-banners" class="day-banners"></div>
+                <div id="day-scroll" class="day-scroll" tabindex="0" aria-label="Hourly schedule">
+                    <div id="day-timeline" class="day-timeline">
+                        <div id="day-hours"></div>
+                        <div id="day-events" class="day-events"></div>
+                    </div>
+                </div>
+            </dialog>
+
+            <dialog id="calendar-event-dialog" class="calendar-dialog event-dialog" aria-labelledby="event-dialog-title">
+                <header class="calendar-dialog-header">
+                    <h2 id="event-dialog-title">New event</h2>
+                    <button id="event-close" type="button" aria-label="Close event editor">✕</button>
+                </header>
+                <form id="event-form">
+                    <label for="event-title">Title</label>
+                    <input id="event-title" maxlength="120" placeholder="For example: Biology exam" required>
+                    <label for="event-notes">Description</label>
+                    <textarea id="event-notes" maxlength="2000" placeholder="Add a description…"></textarea>
+                    <label class="event-checkbox"><input id="event-all-day" type="checkbox"> All day</label>
+                    <div id="event-times" class="event-times">
+                        <div><label for="event-start">Starts</label><input id="event-start" type="datetime-local" min="1901-01-01T00:00" max="2099-12-31T23:59" required></div>
+                        <div><label for="event-end">Ends</label><input id="event-end" type="datetime-local" min="1901-01-01T00:00" max="2099-12-31T23:59" required></div>
+                    </div>
+                    <div id="event-date-row" hidden><label for="event-date">Date</label><input id="event-date" type="date" min="1901-01-01" max="2099-12-31"></div>
+                    <p id="event-error" class="event-error" role="alert" hidden></p>
+                    <footer class="calendar-dialog-actions event-footer">
+                        <button id="event-delete" type="button" hidden>Delete event</button>
+                        <span class="event-footer-spacer"></span>
+                        <button id="event-cancel" type="button">Cancel</button>
+                        <button id="event-save" class="event-primary" type="submit">Save event</button>
+                    </footer>
+                </form>
+            </dialog>
+        </section>
+
     </main>
 </body>
 </html>
