@@ -3,6 +3,8 @@ import os
 import sqlite3
 from pathlib import Path
 from weather import get_weather
+import ctypes
+from ctypes import wintypes
 
 
 DEFAULTS = {"language": "en", "temperature": "fahrenheit", "theme": "dark", "calendar": "gregorian"}
@@ -13,10 +15,55 @@ CHOICES = {
     "calendar": {"gregorian", "chinese"},
 }
 
+def set_title_bar_theme(window, theme):
+    if window is None or window.native is None:
+        return
+
+    hwnd = wintypes.HWND(window.native.Handle.ToInt64())
+
+    set_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
+    set_attribute.argtypes = [
+        wintypes.HWND,
+        wintypes.DWORD,
+        ctypes.c_void_p,
+        wintypes.DWORD,
+    ]
+    set_attribute.restype = ctypes.c_long
+
+    is_dark = theme == "dark"
+
+    dark_mode = wintypes.BOOL(is_dark)
+    background = wintypes.DWORD(
+        0x00212121 if is_dark else 0x00FFFFFF
+    )
+    text_color = wintypes.DWORD(
+        0x00ECECEC if is_dark else 0x00202020
+    )
+
+    attributes = [
+        (20, dark_mode),
+        (35, background),
+        (36, text_color),
+    ]
+
+    for attribute, value in attributes:
+        result = set_attribute(
+            hwnd,
+            attribute,
+            ctypes.byref(value),
+            ctypes.sizeof(value),
+        )
+
+        if result != 0:
+            print(f"Could not update title-bar attribute {attribute}: {result}")
+    
+
+
 
 class SettingsAPI:
     def __init__(self, database_path):
         self._database = Path(database_path)
+        self._window = None
 
     def _connect(self):
         self._database.parent.mkdir(parents=True, exist_ok=True)
@@ -73,6 +120,7 @@ class SettingsAPI:
                 )
         finally:
             connection.close()
+        set_title_bar_theme(self._window, settings["theme"])
         return settings
 
 
@@ -82,8 +130,14 @@ if __name__ == "__main__":
     data_folder = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "MOPA"
     api = SettingsAPI(data_folder / "settings.db")
     page = Path(__file__).resolve().parent / "UI" / "index.html"
-    webview.create_window(
+    window = webview.create_window(
         title="MOPA", url=str(page), js_api=api,
         width=1000, height=700, min_size=(600, 450),
     )
+    api._window = window
+    def apply_saved_title_bar_theme():
+        save_settings = api.get_settings()
+        set_title_bar_theme(window, save_settings["theme"])
+
+    window.events.shown += apply_saved_title_bar_theme
     webview.start(http_server=True)

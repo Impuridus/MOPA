@@ -75,6 +75,12 @@ nav {
     gap: 4px;
 }
 
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
 nav button {
     width: 100%;
     padding: 11px 12px;
