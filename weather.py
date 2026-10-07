@@ -72,3 +72,38 @@ def get_weather(database):
     finally:
         if connection is not None:
             connection.close()
+
+def search_cities(query):
+    if not isinstance(query,str):
+        raise ValueError("Enter a city name.")
+
+    query = query.strip()
+
+    if not 2 <= len(query) <= 100:
+        raise ValueError("Enter between 2 and 100 characters.")
+
+    params = {
+        "name": query,
+        "count": 5,
+        "language": "en",
+        "format": "json"
+    }
+
+    url = ("https://geocoding-api.open-meteo.com/v1/search?" + urlencode(params))
+    request = Request(
+        url,
+        headers={
+            "User-Agent": "MOPA/1.0",
+            "Accept": "application/json",
+        },   
+    )
+
+    try:
+        with urlopen(request, timeout = 15) as response:
+            data = json.load(response)
+    except(OSError, ValueError):
+        raise RuntimeError(
+            "City search unavaviable. Please try again."
+        ) from None
+
+    return data.get("results", [])

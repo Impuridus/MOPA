@@ -40,10 +40,10 @@ function render() {
 
 function showPanel(name) {
     if (name !== "calendar" && !document.getElementById("calendar-panel").hidden && !calendarUI.allowLeave()) return;
-    ["welcome", "workout", "diet", "weather", "music", "calendar", "settings"].forEach(panel => {
+    ["home", "workout", "diet", "weather", "music", "calendar", "settings"].forEach(panel => {
         document.getElementById(`${panel}-panel`).hidden = panel !== name;
     });
-    ["workout", "diet", "weather", "music", "calendar", "settings"].forEach(panel => {
+    ["home", "workout", "diet", "weather", "music", "calendar", "settings"].forEach(panel => {
         const button = document.getElementById(`${panel}-button`);
         button.classList.toggle("active", panel === name);
         if (panel === name) button.setAttribute("aria-current", "page");
@@ -167,12 +167,104 @@ setInterval(() => {
 }, 10 * 60 * 1000);
 
 
-["workout", "diet", "weather", "music", "calendar", "settings"].forEach(name => {
+["home", "workout", "diet", "weather", "music", "calendar", "settings"].forEach(name => {
     document.getElementById(`${name}-button`).addEventListener("click", () => showPanel(name));
 });
 fields.forEach(key => controls[key].addEventListener("change", () => changePreference(key)));
 document.getElementById("retry-button").addEventListener("click", loadSettings);
 window.addEventListener("pywebviewready", loadSettings);
 render();
+showPanel("home")
 loadSettings();
 setInterval(updateClock, 1000);
+
+const citySearchForm = document.getElementById("city-search-form");
+const citySearchInput = document.getElementById("city-search-input");
+const citySearchStatus = document.getElementById("city-search-status");
+const citySearchResults = document.getElementById("city-search-results");
+
+let citySearchTimer;
+let citySearchVersion = 0;
+const citySearchCache = new Map()
+
+async function updateCitySuggestions(query, version) {
+    if (!window.pywebview?.api) {
+        citySearchStatus.textContent = "The app is still starting.";
+        return;
+    }
+
+    citySearchStatus.textContent = "";
+
+    try {
+        const cacheKey = query.toLowerCase();
+        let cities = citySearchCache.get(cacheKey);
+
+        if (cities === undefined) {
+            cities = await window.pywebview.api.search_cities(query);
+            citySearchCache.set(cacheKey, cities);
+        }
+
+        // Ignore an older response if the user has typed again.
+        if (version !== citySearchVersion) return;
+
+        citySearchResults.replaceChildren();
+
+        for (const city of cities) {
+            const item = document.createElement("li");
+
+            item.textContent = [
+                city.name,
+                city.admin1,
+                city.country,
+            ].filter(Boolean).join(", ");
+
+            citySearchResults.append(item);
+        }
+
+        citySearchResults.hidden = cities.length === 0;
+        citySearchStatus.textContent = cities.length
+            ? ""
+            : "No matching cities.";
+    } catch (error) {
+        if (version !== citySearchVersion) return;
+
+        console.error(error);
+        citySearchResults.hidden = true;
+        citySearchStatus.textContent =
+            "Could not search cities. Please try again.";
+    }
+}
+
+function scheduleCitySearch() {
+    clearTimeout(citySearchTimer);
+
+    const version = ++citySearchVersion;
+    const query = citySearchInput.value.trim();
+
+    citySearchResults.replaceChildren();
+    citySearchResults.hidden = true;
+    citySearchStatus.textContent = "";
+
+    if (query.length < 2) return;
+
+    if (query.length > 100) {
+        citySearchStatus.textContent = "Use 100 characters or fewer.";
+        return;
+    }
+
+    if (citySearchCache.has(query.toLowerCase())) {
+        updateCitySuggestions(query, version);
+        return;
+    }
+
+    citySearchTimer = setTimeout(() => {
+        updateCitySuggestions(query, version);
+    }, 100);
+}
+
+citySearchInput.addEventListener("input", scheduleCitySearch);
+
+// Prevent Enter from reloading the page.
+citySearchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+});

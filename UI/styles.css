@@ -75,15 +75,16 @@ nav {
     gap: 4px;
 }
 
-.nav-icon {
-    width: 20px;
-    height: 20px;
+:root:not([data-theme="light"]) .nav-icon {
+    filter: invert(1);
+    width: 15px;
+    height: 15px;
     object-fit: contain;
     flex-shrink: 0;
 }
 nav button {
     width: 100%;
-    padding: 11px 12px;
+    padding: 12px 12px;
     border: none;
     border-radius: 7px;
     background: transparent;
@@ -92,6 +93,11 @@ nav button {
     text-align: left;
     cursor: pointer;
     transition: background 150ms, color 150ms;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
 }
 
 nav button:hover {
@@ -369,3 +375,171 @@ select:disabled { opacity: .6; }
 #weather-panel a { color: var(--text); }
 
 #weather-panel .weather-card .card-value { font-size: 26px; color: var(--text); margin: 14px 0 10px; }
+/* Weather page layout */
+.weather-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.weather-section {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.weather-section h2 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Override the summary's previous outer spacing. */
+.weather-layout .weather-summary {
+    margin: 0;
+}
+
+.weather-layout .weather-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.weather-layout .weather-card {
+    min-width: 0;
+    padding: 16px;
+}
+
+.weather-wide {
+    grid-column: 1 / -1;
+}
+
+.weather-placeholder {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* Stack the sections when the app window is narrow. */
+@media (max-width: 950px) {
+    .weather-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+.weather-header {
+    align-items: flex-end;
+}
+
+.weather-header .city-search {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+.city-search-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    transition: background-color 150ms, border-color 150ms;
+    background: #333333;
+}
+
+.city-search-field:hover {
+    background: #404040;
+}
+
+/* Lighter while typing. Keep this after the hover rule. */
+.city-search-field:focus-within {
+    background: #484848;
+    border-color: var(--muted);
+}
+
+.city-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+}
+
+.search-icon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--muted);
+}
+
+#city-search-input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+}
+
+#city-search-input:focus,
+#city-search-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+#city-search-input::placeholder {
+    color: var(--muted);
+}
+
+.city-search-field {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: visible;
+    transition: background-color 150ms, border-color 150ms;
+}
+
+/* Join the input and dropdown when results are visible. */
+.city-search-field:has(.city-search-results:not([hidden]):not(:empty)) {
+    border-radius: 14px 14px 0 0;
+}
+
+.city-search-results {
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    z-index: 10;
+
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+
+    border: 1px solid var(--border);
+    border-radius: 0 0 14px 14px;
+    background: var(--surface);
+
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.city-search-results:empty {
+    display: none;
+}
+
+.city-search-results li {
+    padding: 10px 14px;
+    border: none;
+}
+
+.city-search-results li:hover {
+    background: var(--hover);
+}

@@ -2,7 +2,7 @@
 import os
 import sqlite3
 from pathlib import Path
-from weather import get_weather
+from weather import get_weather, search_cities
 import ctypes
 from ctypes import wintypes
 
@@ -34,7 +34,7 @@ def set_title_bar_theme(window, theme):
 
     dark_mode = wintypes.BOOL(is_dark)
     background = wintypes.DWORD(
-        0x00212121 if is_dark else 0x00FFFFFF
+        0x00171717 if is_dark else 0x00F5F5F5
     )
     text_color = wintypes.DWORD(
         0x00ECECEC if is_dark else 0x00202020
@@ -93,6 +93,9 @@ class SettingsAPI:
         self._database.parent.mkdir(parents=True, exist_ok=True)
         return get_weather(self._database)
 
+    def search_cities(self, query):
+        return search_cities(query)
+    
     def get_settings(self):
         settings = DEFAULTS.copy()
         connection = self._connect()

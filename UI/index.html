@@ -17,10 +17,27 @@
             <p id="current-date"></p>
         </header>
 
+        
         <nav aria-label="Features" id="feature-nav">
     <section class="nav-section">
+        <h2 class="sidebar-label">Home</h2>
+        <button type="button" id="home-button"
+                aria-controls="home-panel" lang="en">
+                <img src="icons/house.png" 
+                alt=""
+                class="nav-icon">
+                <span>Home</span>
+        </button>
+    </section>
+    <section class="nav-section">
         <h2 class="sidebar-label" data-i18n="work">Work</h2>
-        <button type="button" disabled data-i18n="soon">Coming soon</button>
+        <button type="button" id="to-do-button"
+                aria-controls="to-do-panel" lang="en">
+                <img src="icons/briefcase-business.png" 
+                alt=""
+                class="nav-icon">
+                <span>To-Do</span>
+        </button>
     </section>
 
     <section class="nav-section">
@@ -76,45 +93,111 @@
     </aside>
 
     <main>
-        <section id="welcome-panel" class="welcome">
-            <h1 data-i18n="welcome">Your space, your day.</h1>
-            <p data-i18n="start">Select Weather to get started.</p>
+        <section id="home-panel" lang="en">
+            <header class="panel-header">
+                <h1 tabindex="-1">Home</h1>
+            </header>
         </section>
 
         <section id="weather-panel" hidden>
-            <header class="panel-header">
-                <h1 tabindex="-1" data-i18n="weather">Weather</h1>
+            <header class="panel-header weather-header">
+                <form id="city-search-form" class="city-search">
+                    <div class="city-search-field">
+                        <div class="city-search-row">
+                            <svg
+                                class="search-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                aria-hidden="true"
+                            >
+                                <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                                <path d="m16 16 4 4"></path>
+                            </svg>
+
+                            <input
+                                type="search"
+                                id="city-search-input"
+                                name="city"
+                                aria-label="Search for a city"
+                                placeholder="Search city"
+                                autocomplete="off"
+                                required
+                            >
+                        </div>
+
+                        <ul
+                            id="city-search-results"
+                            class="city-search-results"
+                            hidden
+                        ></ul>
+                    </div>
+                </form>
                 <button type="button" id="refresh-weather" lang="en">Refresh</button>
             </header>
+            <p id="city-search-status" role="status"></p>
+            <ul id="city-search-results" class="city-search-results"></ul>
 
-            <div class="weather-summary">
-                <h2 lang="en">Storrs Mansfield, CT</h2>
-                <p id="weather-status" role="status" lang="en">Open Weather to load current conditions.</p>
-                <p class="temperature" id="temperature"></p>
-                <p class="condition" id="weather-condition" lang="en">—</p>
-                <p id="high-low"></p>
+            <div class="weather-layout">
+                <section class="weather-section weather-summary">
+                    <h2 lang="en">Storrs MansField, CT</h2>
+                    <p id="weather-status", role="status" lang="en">
+                        Open Weather to load current conditions.
+                    </p>
+                    <p class="temperature" id="temperature"></p>
+                    <p class="condition" id="weather-condition" lang="en">-</p>
+                    <p id="high-low"></p>
+                </section>
+
+                <section class="weather-section">
+                    <h2>Weather details</h2>
+                    <div class="weather-details">
+
+                        <article class="weather-card">
+                            <h3 data-i18n="feels">Feels like</h3>
+                            <p class="card-value" id="feels-temperature">-</p>
+                        </article>
+
+                        <article class="weather-card">
+                            <h3 data-i18n="humidity">Humidity</h3>
+                            <p class="card-value" id="humidity-value">—</p>            
+                       </article>
+
+                       <article class="weather-card">
+                            <h3 data-i18n="wind">Wind</h3>
+                            <p class="card-value" id="wind-value"></p>
+                            <p id="wind-direction" lang="en"></p>
+                        </article>
+
+                        <article class="weather-card">
+                            <h3>UV index</h3>
+                            <p class="card-value" id="uv-value">-</p>
+                        </article>
+                    </div>
+                </section>
+                
+                <section class="weather-section weather-wide">
+                    <h2>This Week</h2>
+                    <div id="weekly-forecast">
+                        <p class="weather-placeholder">
+                            Daily conditions and high/low temperatures will appear here
+                        </p>
+                    </div>
+                </section>
+
+                <section class="weather-section weather-wide">
+                    <h2>Your cities</h2>
+
+                    <div id="weather-cities">
+                        <p class="weather-placeholder">
+                            City selection and local weather will appear here.
+                        </p>
+                    </div>
+                </section>
+
             </div>
-
-            <div class="weather-details">
-                <article class="weather-card">
-                    <h3 data-i18n="feels">Feels like</h3>
-                    <p class="card-value" id="feels-temperature"></p>
-                    
-                </article>
-
-                <article class="weather-card">
-                    <h3 data-i18n="humidity">Humidity</h3>
-                    <p class="card-value" id="humidity-value">—</p>
-                    
-                </article>
-
-                <article class="weather-card">
-                    <h3 data-i18n="wind">Wind</h3>
-                    <p class="card-value" id="wind-value"></p>
-                    <p id="wind-direction" lang="en"></p>
-                </article>
-            </div>
-            <p class="settings-intro" lang="en">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · Current conditions are model estimates. Times shown are local to Storrs.</p>
         </section>
         <section id="settings-panel" hidden>
             <header class="panel-header"><h1 tabindex="-1" data-i18n="settings">Settings</h1></header>
